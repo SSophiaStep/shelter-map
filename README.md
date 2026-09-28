@@ -30,4 +30,5 @@ FastAPI · PostgreSQL/PostGIS · SQLAlchemy 2 · Alembic · Redis · Nginx · Do
 
 Див. \[docs/architecture.md](docs/architecture.md)
 
-<img width="1410" height="443" alt="Знімок екрана 2026-09-28 054433" src="https://github.com/user-attachments/assets/74431e38-7499-4c9e-8070-55a01d468268" />
+![Uploading Nginx Reverse Proxy-2026-09-28-024650.png…]()
+
