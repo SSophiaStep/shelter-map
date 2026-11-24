@@ -1,0 +1,55 @@
+=== 1. Round Robin: 20 послідовних запитів GET /live через Nginx (http://localhost:8080) ===
+запит  1 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит  2 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит  3 -> {"status":"ok","instance":"backend2"}   [X-Served-By: backend2]
+запит  4 -> {"status":"ok","instance":"backend3"}   [X-Served-By: backend3]
+запит  5 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит  6 -> {"status":"ok","instance":"backend2"}   [X-Served-By: backend2]
+запит  7 -> {"status":"ok","instance":"backend3"}   [X-Served-By: backend3]
+запит  8 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит  9 -> {"status":"ok","instance":"backend2"}   [X-Served-By: backend2]
+запит 10 -> {"status":"ok","instance":"backend3"}   [X-Served-By: backend3]
+запит 11 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит 12 -> {"status":"ok","instance":"backend2"}   [X-Served-By: backend2]
+запит 13 -> {"status":"ok","instance":"backend3"}   [X-Served-By: backend3]
+запит 14 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит 15 -> {"status":"ok","instance":"backend2"}   [X-Served-By: backend2]
+запит 16 -> {"status":"ok","instance":"backend3"}   [X-Served-By: backend3]
+запит 17 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+запит 18 -> {"status":"ok","instance":"backend2"}   [X-Served-By: backend2]
+запит 19 -> {"status":"ok","instance":"backend3"}   [X-Served-By: backend3]
+запит 20 -> {"status":"ok","instance":"backend1"}   [X-Served-By: backend1]
+
+--- Підсумок:
+{'backend1': 19, 'backend2': 21, 'backend3': 20}
+
+--- Лог Nginx (останні 6 рядків):
+127.0.0.1 [24/Nov/2026:08:22:38 +0200] "GET /live HTTP/1.1" 200 upstream=127.0.0.1:8003 served_by=backend3 rt=0.001 urt=0.001
+127.0.0.1 [24/Nov/2026:08:22:38 +0200] "GET /live HTTP/1.1" 200 upstream=127.0.0.1:8001 served_by=backend1 rt=0.000 urt=0.000
+127.0.0.1 [24/Nov/2026:08:22:38 +0200] "GET /live HTTP/1.1" 200 upstream=127.0.0.1:8002 served_by=backend2 rt=0.001 urt=0.001
+127.0.0.1 [24/Nov/2026:08:22:38 +0200] "GET /live HTTP/1.1" 200 upstream=127.0.0.1:8003 served_by=backend3 rt=0.000 urt=0.000
+127.0.0.1 [24/Nov/2026:08:22:38 +0200] "GET /live HTTP/1.1" 200 upstream=127.0.0.1:8001 served_by=backend1 rt=0.001 urt=0.001
+127.0.0.1 [24/Nov/2026:08:22:38 +0200] "GET /live HTTP/1.1" 200 upstream=127.0.0.1:8002 served_by=backend2 rt=0.001 urt=0.001
+
+=== 2. Відмовостійкість: зупиняємо backend2 (kill -9) ===
+--- Прямий запит до зупиненої репліки:
+HTTP 000
+з'єднання відхилено
+--- 20 запитів через Nginx після збою:
+200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200
+--- Розподіл відповідей:
+{'backend1': 30, 'backend3': 30}
+--- Помилка в error.log Nginx (репліку виключено з маршрутизації):
+2026/11/24 08:22:39 [error] 10548#10548: *90 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /live HTTP/1.1", upstream: "http://127.
+2026/11/24 08:22:39 [error] 10548#10548: *94 connect() failed (111: Connection refused) while connecting to upstream, client: 127.0.0.1, server: , request: "GET /live HTTP/1.1", upstream: "http://127.
+2026/11/24 08:22:39 [warn] 10548#10548: *94 upstream server temporarily disabled while connecting to upstream, client: 127.0.0.1, server: , request: "GET /live HTTP/1.1", upstream: "http://127.0.0.1:8
+
+=== 3. Відновлення: запускаємо backend2 назад ===
+backend2 піднято. Чекаємо fail_timeout=10s, потім 60 запитів:
+{'backend1': 21, 'backend2': 19, 'backend3': 20}
+
+=== 4. Альтернативні алгоритми (60 запитів кожен) ===
+weighted (weight 3:2:1), послідовно:   backend1=31  backend2=20  backend3=9
+ip_hash, послідовно (один клієнт):     backend3=60
+least_conn, 10 паралельних запитів:    backend1=17  backend2=23  backend3=20
+round_robin, 10 паралельних запитів:   backend1=21  backend2=20  backend3=19

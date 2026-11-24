@@ -1,0 +1,30 @@
+# VCS і службові файли
+.git
+.gitignore
+.github
+.idea
+.vscode
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Секрети та локальні налаштування (передаються через змінні оточення)
+.env
+.env.*
+!.env.example
+
+# Логи, тести, документація та інструменти розробки не потрібні в образі
+*.log
+logs/
+tests/
+loadtest/
+requirements-dev.txt
+pytest.ini
+Dockerfile
+.dockerignore

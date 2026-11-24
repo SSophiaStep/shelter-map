@@ -1,0 +1,21 @@
+                                                                     QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=3837.96..3837.99 rows=10 width=29) (actual time=7.908..7.911 rows=20 loops=1)
+   Buffers: shared hit=130
+   ->  Sort  (cost=3837.96..3837.99 rows=10 width=29) (actual time=7.906..7.908 rows=20 loops=1)
+         Sort Key: (st_distance(location, '0101000020E6100000713D0AD7A3F0394085EB51B81E254840'::geography, false))
+         Sort Method: top-N heapsort  Memory: 27kB
+         Buffers: shared hit=130
+         ->  Bitmap Heap Scan on places  (cost=14.24..3837.80 rows=10 width=29) (actual time=7.420..7.831 rows=329 loops=1)
+               Filter: st_dwithin(location, '0101000020E6100000713D0AD7A3F0394085EB51B81E254840'::geography, '2000'::double precision, false)
+               Rows Removed by Filter: 235
+               Heap Blocks: exact=24
+               Buffers: shared hit=127
+               ->  Bitmap Index Scan on idx_places_location  (cost=0.00..14.23 rows=244 width=0) (actual time=0.125..0.125 rows=564 loops=1)
+                     Index Cond: (location && _st_expand('0101000020E6100000713D0AD7A3F0394085EB51B81E254840'::geography, '2000'::double precision))
+                     Buffers: shared hit=15
+ Planning:
+   Buffers: shared hit=215
+ Planning Time: 6.648 ms
+ Execution Time: 8.022 ms
+(18 rows)

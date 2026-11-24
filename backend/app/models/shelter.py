@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
 
 
-class PlaceType(str, enum.Enum):
+class PlaceType(enum.StrEnum):
     SHELTER = "shelter"
     HEATING = "heating"
 

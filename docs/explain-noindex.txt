@@ -1,0 +1,25 @@
+   Buffers: shared hit=2081
+   ->  Gather Merge  (cost=738492.44..738493.13 rows=6 width=29) (actual time=155.515..168.614 rows=20 loops=1)
+         Workers Planned: 1
+         Workers Launched: 1
+         Buffers: shared hit=2081
+         ->  Sort  (cost=737492.43..737492.45 rows=6 width=29) (actual time=89.315..89.318 rows=10 loops=2)
+               Sort Key: (st_distance(location, '0101000020E6100000713D0AD7A3F0394085EB51B81E254840'::geography, false))
+               Sort Method: top-N heapsort  Memory: 27kB
+               Buffers: shared hit=2081
+               Worker 0:  Sort Method: quicksort  Memory: 25kB
+               ->  Parallel Seq Scan on places  (cost=0.00..737492.35 rows=6 width=29) (actual time=81.333..89.235 rows=164 loops=2)
+                     Filter: st_dwithin(location, '0101000020E6100000713D0AD7A3F0394085EB51B81E254840'::geography, '2000'::double precision, false)
+                     Rows Removed by Filter: 49836
+                     Buffers: shared hit=2044
+ Planning:
+   Buffers: shared hit=167
+ Planning Time: 4.247 ms
+ JIT:
+   Functions: 9
+   Options: Inlining true, Optimization true, Expressions true, Deforming true
+   Timing: Generation 1.173 ms, Inlining 373.775 ms, Optimization 90.004 ms, Emission 68.650 ms, Total 533.602 ms
+ Execution Time: 2088.933 ms
+(23 rows)
+
+ROLLBACK

@@ -21,3 +21,11 @@ Thumbs.db
 # Docker / data
 pgdata/
 redisdata/
+
+# Налаштування середовищ: реальні файли не комітяться, лише *.example
+.env.*
+!.env.example
+!.env.*.example
+
+# Результати навантажувальних тестів (звіти й графіки лежать у docs/)
+backend/loadtest/results/
